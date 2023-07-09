@@ -1,5 +1,6 @@
 package net.buycraft.plugin.fabric;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.buycraft.plugin.BuyCraftAPI;
 import net.buycraft.plugin.IBuycraftPlatform;
 import net.buycraft.plugin.UuidUtil;
@@ -36,7 +37,11 @@ public class FabricBuycraftPlatform implements IBuycraftPlatform {
 
     @Override
     public void dispatchCommand(String command) {
-        plugin.getServer().getCommandManager().execute(plugin.getServer().getCommandSource(), command);
+        try {
+            plugin.getServer().getCommandManager().getDispatcher().execute(command, plugin.getServer().getCommandSource());
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -75,7 +80,7 @@ public class FabricBuycraftPlatform implements IBuycraftPlatform {
 
     @Override
     public int getFreeSlots(QueuedPlayer player) {
-        return getPlayer(player).map(value -> Math.max(0, 36 - value.inventory.size())).orElse(-1);
+        return getPlayer(player).map(value -> Math.max(0, 36 - value.getInventory().size())).orElse(-1);
     }
 
     @Override

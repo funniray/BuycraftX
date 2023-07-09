@@ -29,9 +29,10 @@ import net.buycraft.plugin.shared.tasks.ListingUpdateTask;
 import net.buycraft.plugin.shared.tasks.PlayerJoinCheckTask;
 import net.buycraft.plugin.shared.util.AnalyticsSend;
 import net.fabricmc.api.DedicatedServerModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.server.MinecraftServer;
 import okhttp3.OkHttpClient;
 import org.apache.logging.log4j.LogManager;
@@ -72,8 +73,7 @@ public class BuycraftPlugin implements DedicatedServerModInitializer {
     private ServerEventSenderTask serverEventSenderTask;
     private BuyCommand buyCommand;
 
-    private final String MOD_VERSION = "1.0.0";
-    private final int TICKS_PER_SECOND = 50;
+    private final int MS_PER_TICK = 50;
 
     private final Path MOD_PATH = new File("./mods/" + MOD_ID).toPath();
 
@@ -112,7 +112,7 @@ public class BuycraftPlugin implements DedicatedServerModInitializer {
 
             // Check for latest version.
             if (configuration.isCheckForUpdates()) {
-                VersionCheck check = new VersionCheck(this, MOD_VERSION, configuration.getServerKey());
+                VersionCheck check = new VersionCheck(this, this.getModVersion(), configuration.getServerKey());
                 try {
                     check.verify();
                 } catch (IOException e) {
@@ -146,12 +146,12 @@ public class BuycraftPlugin implements DedicatedServerModInitializer {
             completedCommandsTask = new PostCompletedCommandsTask(platform);
             commandExecutor = new QueuedCommandExecutor(platform, completedCommandsTask);
 
-            Multithreading.schedule((Runnable) commandExecutor, TICKS_PER_SECOND, TICKS_PER_SECOND, TimeUnit.MILLISECONDS);
-            Multithreading.schedule(completedCommandsTask, TICKS_PER_SECOND*20, TICKS_PER_SECOND*20, TimeUnit.MILLISECONDS);
+            Multithreading.schedule((Runnable) commandExecutor, MS_PER_TICK, MS_PER_TICK, TimeUnit.MILLISECONDS);
+            Multithreading.schedule(completedCommandsTask, MS_PER_TICK *20, MS_PER_TICK *20, TimeUnit.MILLISECONDS);
             playerJoinCheckTask = new PlayerJoinCheckTask(platform);
-            Multithreading.schedule(playerJoinCheckTask, TICKS_PER_SECOND*20, TICKS_PER_SECOND*20, TimeUnit.MILLISECONDS);
+            Multithreading.schedule(playerJoinCheckTask, MS_PER_TICK *20, MS_PER_TICK *20, TimeUnit.MILLISECONDS);
             serverEventSenderTask = new ServerEventSenderTask(platform, configuration.isVerbose());
-            Multithreading.schedule(serverEventSenderTask, (TICKS_PER_SECOND*20)*60, (TICKS_PER_SECOND*20)*60, TimeUnit.MILLISECONDS);
+            Multithreading.schedule(serverEventSenderTask, (MS_PER_TICK *20)*60, (MS_PER_TICK *20)*60, TimeUnit.MILLISECONDS);
             listingUpdateTask = new ListingUpdateTask(platform, null);
             if (apiClient != null) {
                 getLogger().info("Fetching all server packages...");
@@ -399,7 +399,7 @@ public class BuycraftPlugin implements DedicatedServerModInitializer {
     }
 
     public String getModVersion() {
-        return MOD_VERSION;
+        return FabricLoaderImpl.INSTANCE.getModContainer(MOD_ID).get().getMetadata().getVersion().getFriendlyString();
     }
 
     public BuyCommand getBuyCommand() {

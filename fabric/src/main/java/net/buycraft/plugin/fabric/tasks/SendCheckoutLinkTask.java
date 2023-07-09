@@ -4,7 +4,7 @@ import net.buycraft.plugin.data.responses.CheckoutUrlResponse;
 import net.buycraft.plugin.fabric.BuycraftPlugin;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,16 +31,16 @@ public class SendCheckoutLinkTask implements Runnable {
         try {
             response = plugin.getApiClient().getCheckoutUri(player.getName(), pkgId).execute().body();
         } catch (IOException e) {
-            player.sendFeedback(new LiteralText(plugin.getI18n().get("cant_check_out")).formatted(Formatting.RED), false);
+            player.sendFeedback(Text.literal(plugin.getI18n().get("cant_check_out")).formatted(Formatting.RED), false);
             return;
         }
         if (response != null) {
-                player.sendFeedback(new LiteralText("                                            ").formatted(Formatting.STRIKETHROUGH), false);
+                player.sendFeedback(Text.literal("                                            ").formatted(Formatting.STRIKETHROUGH), false);
             Arrays.asList(
-                    new LiteralText(plugin.getI18n().get("to_buy_this_package")).formatted(Formatting.GREEN),
-                    new LiteralText(response.getUrl()).formatted(Formatting.BLUE, Formatting.UNDERLINE).styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, response.getUrl())))
+                    Text.literal(plugin.getI18n().get("to_buy_this_package")).formatted(Formatting.GREEN),
+                    Text.literal(response.getUrl()).formatted(Formatting.BLUE, Formatting.UNDERLINE).styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, response.getUrl())))
             ).forEach(msg -> player.sendFeedback(msg, false));
-            player.sendFeedback(new LiteralText("                                            ").formatted(Formatting.STRIKETHROUGH), false);
+            player.sendFeedback(Text.literal("                                            ").formatted(Formatting.STRIKETHROUGH), false);
         }
     }
 }

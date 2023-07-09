@@ -44,7 +44,7 @@ subprojects {
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://repo.dmulloy2.net/nexus/repository/public/")
-        maven("https://repo.nukkitx.com/maven-snapshots/")
+        maven("https://repo.opencollab.dev/maven-snapshots/")
         maven("https://repo.spongepowered.org/maven")
         maven("https://maven.minecraftforge.net/")
         mavenLocal()
