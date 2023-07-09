@@ -2,40 +2,23 @@ package net.buycraft.plugin.fabric.command;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.buycraft.plugin.BuyCraftAPI;
 import net.buycraft.plugin.data.Category;
 import net.buycraft.plugin.data.Package;
-import net.buycraft.plugin.data.responses.ServerInformation;
 import net.buycraft.plugin.fabric.BuycraftPlugin;
 import net.buycraft.plugin.shared.util.Node;
-import net.buycraft.plugin.shared.util.ReportBuilder;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class BuyCommand {
@@ -72,14 +55,12 @@ public class BuyCommand {
 
         List<MutableText> contents;
         if(subcategories.size() > 0) {
-            contents = subcategories.stream().map(category -> {
-                return Text.literal("> " + category.getName())
-                        .formatted(Formatting.GRAY)
-                        .styled(style -> style
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tebex packages " + category.getId()))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to view packages in this category")))
-                        );
-            }).collect(Collectors.toList());
+            contents = subcategories.stream().map(category -> Text.literal("> " + category.getName())
+                    .formatted(Formatting.GRAY)
+                    .styled(style -> style
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tebex packages " + category.getId()))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to view packages in this category")))
+                    )).collect(Collectors.toList());
         } else {
             contents = new ArrayList<>();
             for (Package p : node.getPackages()) {

@@ -1,5 +1,3 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
 defaultTasks("shadowJar")
 
 plugins {
@@ -32,7 +30,7 @@ subprojects {
         processResources {
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
-            filesNotMatching(listOf("**/*.zip", "**/*.properties")) {
+            filesNotMatching(listOf("**/*.zip", "**/*.properties", "**/*.mod.json")) {
                 expand("pluginVersion" to version)
             }
         }
@@ -44,6 +42,7 @@ subprojects {
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://repo.dmulloy2.net/nexus/repository/public/")
+        maven("https://repo.opencollab.dev/maven-releases/")
         maven("https://repo.opencollab.dev/maven-snapshots/")
         maven("https://repo.spongepowered.org/maven")
         maven("https://maven.minecraftforge.net/")
